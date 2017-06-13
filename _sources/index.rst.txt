@@ -2,9 +2,21 @@
    sphinx-quickstart on Tue Jun 13 15:06:56 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
+   
+.. currentmodule:: pls_uncertainty
 
-Welcome to pls_uncertainty's documentation!
-===========================================
+Machine Learning Uncertainty Estimation Toolbox
+===============================================
+
+*David A. Sheen*
+
+*National Institute of Standards and Technology*
+
+*Last Revision* |today|
+
+`Download this software from GitHub <https://github.com/davidasheen/pls_uncertainty>`_
+
+
 
 .. toctree::
    :maxdepth: 2
