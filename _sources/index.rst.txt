@@ -16,13 +16,33 @@ Machine Learning Uncertainty Estimation Toolbox
 
 `Download this software from GitHub <https://github.com/davidasheen/pls_uncertainty>`_
 
+Welcome to the home page for the Machine Learning Uncertainty Toolbox. This software is a Python package that calculates uncertainties in machine learning models using bootstrapping and residual bootstrapping. It is intended to interface with scikit-learn but any Python package that uses a similar interface should work.
 
+Legal
++++++
+
+This software is subject to the NIST Software License (revised as of May 2015). This license can be found in the GitHub repo in the file named LICENSE. The following is a hopefully-useful but not-legally-binding summary:
+
+  * NIST software authored by NIST employees is in the public domain (15 USC 105).
+  * The software has NO WARRANTY.
+  * You may modify the software and distribute your modifications. If you do, you should note your changes and cite the original.
+  * If you use the software, you should cite the software and the papers documenting its development.
+
+Contents
+++++++++
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+Links
++++++
 
+`GitHub profile <https://github.com/davidasheen>`_
+
+`NIST GitHub Organization <https://github.com/usnistgov>`_
+
+`NIST home page <http://nist.gov>`_
 
 Indices and tables
 ==================
