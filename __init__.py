@@ -1,4 +1,5 @@
 import numpy as np
+import sklearn.decomposition
 import sklearn.cross_decomposition
 import sklearn.model_selection
 import math
@@ -78,6 +79,8 @@ def simple_bootstrap(xdata=None,ydata=None,
                      cv_object=None,class_value=0.5,samples=1000,PLS_kw=None,return_boot=False):
     """Conducts a simple residual bootstrap analysis on a set of data. Computes cross-validation uncertainty.
     
+    This function relies on the Y-data being bootstrapped to be one-dimensional. It also requires the model to be accept two-dimensional data. The bootstrapping is done by generating :math:`samples` random variations on the Y-data and then concatenating them into a two-dimensional array.
+    
     If PLS_model is None, then PLS_cv and PLS_bootstrap are ignored. The function will create independent instances of :py:class:sk_model for each of PLS_model, PLS_cv, and PLS_boostrap.
     
     If PLS_model is not None, then it will be reused for PLS_cv and PLS_bootstrap.
@@ -98,7 +101,7 @@ def simple_bootstrap(xdata=None,ydata=None,
     :type PLS_model: scikit-learn model instance
     :type PLS_cv: scikit-learn model instance
     :type PLS_bootstrap: scikit-learn model instance
-    :type s_model: scikit-learn model
+    :type skmodel: scikit-learn model
     :type cv_object: scikit-learn model selection instance
     :type class_value: scalar
     :type samples: int
@@ -137,6 +140,11 @@ def simple_bootstrap(xdata=None,ydata=None,
     residual,err,mse = get_residual_stats(ydata,class_predicted_train)
     residual_cv,err_cv,msecv = get_residual_stats(ydata,class_predicted_cv)
     
+    
+    print('Y data shape',ydata.shape)
+    print('Output shapes',class_predicted_train.shape,class_predicted_cv.shape)
+    print('Meas squared error:',mse,msecv)
+    
     #Calculate the pseudo degrees of freedom and the corresponding bootstrap weighting factor
     num_train = len(ydata)
     pseudo_dof = num_train * (1 - np.sqrt(mse/msecv))
@@ -168,7 +176,39 @@ def simple_bootstrap(xdata=None,ydata=None,
 def bootstrap(xdata=None,ydata=None,validdata=None,
                      PLS_model=None,PLS_cv=None,PLS_bootstrap=None,sk_model=sklearn.cross_decomposition.PLSRegression,regression=False,
                      cv_object=None,class_value=0.5,samples=1000,PLS_kw=None,return_scores=False,return_loadings=False,tq=True):
-    """Conducts a residual bootstrap analysis on a set of data. Computes cross-validation uncertainty.
+    """Conducts a simple residual bootstrap analysis on a set of data. Computes cross-validation uncertainty.
+    
+    This function performs a full bootstrap and makes no assumption about the shape or structure of the Y data. Each bootstrap sample will have an independent model fit to it.
+    
+    If PLS_model is None, then PLS_cv and PLS_bootstrap are ignored. The function will create independent instances of :py:class:sk_model for each of PLS_model, PLS_cv, and PLS_boostrap.
+    
+    If PLS_model is not None, then it will be reused for PLS_cv and PLS_bootstrap.
+    
+    :key xdata: The X data used to fit the model (default None)
+    :key ydata: The Y data used to fit the model (default None)
+    :key validdata: Additional data not used to fit the model but for which uncertainty will be calculated
+    :key PLS_model: The scikit-learn model that will be fit using X and Y
+    :key PLS_cv: The scikit-learn model that will be used for cross-validation
+    :key PLS_bootstrap: The scikit-learn model that will be used for bootstrapping
+    :key sk_model: If PLS_model,PLS_cv,or PLS_bootstrap is None, this scikit-learn model will be used to create them
+    :key cv_object: The cross-validation model that will be used for calculating cross-validation statistics
+    :key class_value: The value separating the classes in PLS-DA
+    :key samples: The number of samples for bootstrapping
+    :key PLS_kw: The keyword arguments that will be passed to sk_model
+    :key return_scores: If True, returns the scores of the PLS_bootstrap model as part of the output
+    :key return_loadings: If True, returns the loadings of the PLS_bootstrap model as part of the output
+    :type xdata: ndarray
+    :type ydata: 1-d array
+    :type PLS_model: scikit-learn model instance
+    :type PLS_cv: scikit-learn model instance
+    :type PLS_bootstrap: scikit-learn model instance
+    :type s_model: scikit-learn model
+    :type cv_object: scikit-learn model selection instance
+    :type class_value: scalar
+    :type samples: int
+    :type PLS_kw: dict
+    :type return_scores: Boolean
+    :type return_loadings: Boolean
     """
     if PLS_model is None:
         #PLS_model = sklearn.cross_decomposition.PLSRegression(**PLS_kw)
@@ -320,7 +360,26 @@ def bootstrap_unc(xdata=None,ydata=None,valid_data=None,
                         cv_object=None,
                         samples=1000,class_value=0.5,
                         PLS_kw=None,return_scores=False,tq=True):
-    """"""
+    """Computes the uncertainty in a bootstrap analysis by leave-one-out cross-validation.
+    
+    For each sample, the uncertainty is calculated by fitting the other samples to the model, calculating the bootstrap uncertainty and then calculating the uncertainty in the held-out sample.
+    
+    :key xdata: The X data used to fit the model (default None)
+    :key ydata: The Y data used to fit the model (default None)
+    :key valid_data: Additional data not used to fit the model but for which uncertainty will be calculated
+    :key cv_object: The cross-validation model that will be used for calculating cross-validation statistics
+    :key samples: The number of samples for bootstrapping
+    :key class_value: The value separating the classes in PLS-DA
+    :key PLS_kw: The keyword arguments that will be passed to sk_model
+    :key return_scores: If True, returns the scores of the PLS_bootstrap model as part of the output
+    :type xdata: ndarray
+    :type ydata: ndarray
+    :type cv_object: scikit-learn model selection instance
+    :type class_value: scalar
+    :type samples: int
+    :type PLS_kw: dict
+    :type return_scores: Boolean
+    """
     
     pls_comps = PLS_kw['n_components']
     
@@ -414,12 +473,42 @@ def bootstrap_unc(xdata=None,ydata=None,valid_data=None,
 
 
 def pca_bootstrap(xdata=None,ydata=None,groups=None,validdata=None,
-                  PCA_model=None,PCA_cv=None,PCA_bootstrap=None,
+                  PCA_model=None,PCA_cv=None,PCA_bootstrap=None,skmodel=sklearn.decomposition.PCA,
                   cv_object=None,samples=1000,PCA_kw=None,tq=True):
+    """Conducts a residual bootstrap analysis on a set of data. Computes cross-validation uncertainty.
+    
+    This function is the same as :py:func:`bootstrap` but works for unsupervised models such as PCA
+    
+    If PLS_model is None, then PLS_cv and PLS_bootstrap are ignored. The function will create independent instances of :py:class:sk_model for each of PLS_model, PLS_cv, and PLS_boostrap.
+    
+    If PLS_model is not None, then it will be reused for PLS_cv and PLS_bootstrap.
+    
+    :key xdata: The X data used to fit the model (default None)
+    :key ydata: The Y data used to fit the model (default None)
+    :key PCA_model: The scikit-learn model that will be fit using X
+    :key PCA_cv: The scikit-learn model that will be used for cross-validation
+    :key PCA_bootstrap: The scikit-learn model that will be used for bootstrapping
+    :key sk_model: If PLS_model,PLS_cv,or PLS_bootstrap is None, this scikit-learn model will be used to create them
+    :key cv_object: The cross-validation model that will be used for calculating cross-validation statistics
+    :key samples: The number of samples for bootstrapping
+    :key PCA_kw: The keyword arguments that will be passed to sk_model
+    :key return_boot: If True, returns the PLS_bootstrap model as part of the output
+    :type xdata: ndarray
+    :type ydata: ndarray
+    :type PCA_model: scikit-learn model instance
+    :type PCA_cv: scikit-learn model instance
+    :type PCA_bootstrap: scikit-learn model instance
+    :type s_model: scikit-learn model
+    :type cv_object: scikit-learn model selection instance
+    :type class_value: scalar
+    :type samples: int
+    :type PCA_kw: dict
+    :type return_boot: Boolean
+    """
     if PCA_model is None:
-        PCA_model = sklearn.decomposition.PCA(**PCA_kw)
-        PCA_cv = sklearn.decomposition.PCA(**PCA_kw)
-        PCA_bootstrap = sklearn.decomposition.PCA(**PCA_kw)
+        PCA_model = skmodel(**PCA_kw)
+        PCA_cv = skmodel(**PCA_kw)
+        PCA_bootstrap = skmodel(**PCA_kw)
     
     tpca = PCA_model.fit(xdata)
     scores = PCA_model.transform(xdata)
@@ -595,13 +684,19 @@ def cross_validate(xdata=None,ydata=None,PLS_model=None,cv_object=None,
                    sk_model=sklearn.cross_decomposition.PLSRegression,PLS_kw=None,class_value=0.5):
     """Conducts a cross-validation analysis on a set of data using a regression algorithm
     
-    :param xdata:
-    :param ydata:
-    :param PLS_model:
-    :param cv_object:
-    :param PLS_kw:
-    :param class_value:
-    
+    :key xdata: The X data used to fit the model (default None)
+    :key ydata: The Y data used to fit the model (default None)
+    :key PLS_model: The scikit-learn model that will be fit using X and Y
+    :key cv_object: The cross-validation model that will be used for calculating cross-validation statistics
+    :key sk_model: If PLS_model,PLS_cv,or PLS_bootstrap is None, this scikit-learn model will be used to create them
+    :key PLS_kw: The keyword arguments that will be passed to sk_model
+    :key class_value: The value separating the classes in PLS-DA
+    :type xdata: ndarray
+    :type ydata: ndarray
+    :type PLS_model: scikit-learn model instance
+    :type sk_model: scikit-learn model
+    :type cv_object: scikit-learn model selection instance
+    :type class_value: scalar
     """
     if PLS_model is None:
         PLS_model = sk_model(**PLS_kw)
@@ -616,7 +711,7 @@ def cross_validate(xdata=None,ydata=None,PLS_model=None,cv_object=None,
     
     y_cv = sklearn.model_selection.cross_val_predict(PLS_model,xdata,ydata,cv=cv_object)
     
-    class_predicted_cv,class_assigned_cv = class_assignment(data=y_cv,class_value=class_value)
+    class_assigned_cv,class_predicted_cv = class_assignment(data=y_cv,class_value=class_value)
     
     return class_assigned_cv,class_predicted_cv
 
@@ -631,7 +726,7 @@ def get_residual_stats(true_y,predicted_y):
     mse = err.sum() / len(true_y)
     return residual,err,mse
 
-def bootstrap_uncertainty(element_number,
+def _bootstrap_uncertainty(element_number,
                           xdata=None,ydata=None,valid_data=None,
                           samples=1000,class_value=0.5,
                           PLS_kw=None,return_scores=False):
