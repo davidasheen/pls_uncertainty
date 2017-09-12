@@ -53,6 +53,32 @@
             
   <div class="section" id="module-reference">
 <h1>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pls_uncertainty.cross_validate" title="pls_uncertainty.cross_validate"><code class="xref py py-obj docutils literal"><span class="pre">cross_validate</span></code></a>([xdata,&nbsp;ydata,&nbsp;PLS_model,&nbsp;...])</td>
+<td>Conducts a cross-validation analysis on a set of data using a regression algorithm</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pls_uncertainty.simple_bootstrap" title="pls_uncertainty.simple_bootstrap"><code class="xref py py-obj docutils literal"><span class="pre">simple_bootstrap</span></code></a>([xdata,&nbsp;ydata,&nbsp;PLS_model,&nbsp;...])</td>
+<td>Conducts a simple residual bootstrap analysis on a set of data.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pls_uncertainty.bootstrap" title="pls_uncertainty.bootstrap"><code class="xref py py-obj docutils literal"><span class="pre">bootstrap</span></code></a>([xdata,&nbsp;ydata,&nbsp;validdata,&nbsp;...])</td>
+<td>Conducts a simple residual bootstrap analysis on a set of data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pls_uncertainty.bootstrap_unc" title="pls_uncertainty.bootstrap_unc"><code class="xref py py-obj docutils literal"><span class="pre">bootstrap_unc</span></code></a>([xdata,&nbsp;ydata,&nbsp;valid_data,&nbsp;...])</td>
+<td>Computes the uncertainty in a bootstrap analysis by leave-one-out cross-validation.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pls_uncertainty.pca_bootstrap" title="pls_uncertainty.pca_bootstrap"><code class="xref py py-obj docutils literal"><span class="pre">pca_bootstrap</span></code></a>([xdata,&nbsp;ydata,&nbsp;groups,&nbsp;...])</td>
+<td>Conducts a residual bootstrap analysis on a set of data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pls_uncertainty.misclass_probability" title="pls_uncertainty.misclass_probability"><code class="xref py py-obj docutils literal"><span class="pre">misclass_probability</span></code></a>(probability_zero,&nbsp;...)</td>
+<td>Estimate the misclassification probability of a sample, which is based on the confidence level of the prediction compared to the true value.</td>
+</tr>
+</tbody>
+</table>
 <dl class="function">
 <dt id="pls_uncertainty.cross_validate">
 <code class="descclassname">pls_uncertainty.</code><code class="descname">cross_validate</code><span class="sig-paren">(</span><em>xdata=None</em>, <em>ydata=None</em>, <em>PLS_model=None</em>, <em>cv_object=None</em>, <em>sk_model=&lt;class 'sklearn.cross_decomposition.pls_.PLSRegression'&gt;</em>, <em>PLS_kw=None</em>, <em>class_value=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pls_uncertainty.html#cross_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pls_uncertainty.cross_validate" title="Permalink to this definition">¶</a></dt>
