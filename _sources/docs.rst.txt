@@ -1,0 +1,17 @@
+Module Reference
+****************
+
+
+.. currentmodule:: pls_uncertainty
+
+.. autofunction:: cross_validate
+
+.. autofunction:: simple_bootstrap
+
+.. autofunction:: bootstrap
+
+.. autofunction:: bootstrap_unc
+
+.. autofunction:: pca_bootstrap
+
+.. autofunction:: misclass_probability
